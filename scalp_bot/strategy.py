@@ -5,9 +5,6 @@ from dataclasses import dataclass
 from .config import StrategyConfig
 from .models import Candle
 
-FLOATING_POINT_TOLERANCE = 1e-9
-
-
 @dataclass(slots=True)
 class StrategyState:
     ema_fast: list[float]
@@ -41,7 +38,7 @@ class ScalpingStrategy:
         if index <= 0:
             return False
         candle = candles[index]
-        if abs(candle.close) <= FLOATING_POINT_TOLERANCE:
+        if candle.close == 0:
             return False
         prev = candles[index - 1]
         fast = state.ema_fast[index]

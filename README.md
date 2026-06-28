@@ -80,3 +80,7 @@ The sample strategy is a configurable long-only scalping template that uses:
 - stop loss, take profit, cooldowns, and time-based exits
 
 You can change the parameters in `config/sample_config.json` and rerun backtests or optimization.
+
+## Backtest limitation to understand
+
+This framework uses OHLCV candles, not tick-by-tick data. If a candle touches both the stop loss and take profit in the same bar, the backtest uses a **conservative stop-first assumption**.

@@ -11,6 +11,7 @@ FLOATING_POINT_TOLERANCE = 1e-9
 MIN_DRAWDOWN_FLOOR = 0.05
 MAX_PROFIT_FACTOR_FOR_SCORING = 5.0
 TRADE_QUALITY_SMOOTHING_FACTOR = 5
+INTRABAR_CONFLICT_EXIT_REASON = "stop_loss"
 
 
 class Backtester:
@@ -59,7 +60,7 @@ class Backtester:
                 target_hit = candle.high >= position.take_profit_price
                 if stop_hit and target_hit:
                     exit_price = position.stop_price
-                    exit_reason = "stop_loss"
+                    exit_reason = INTRABAR_CONFLICT_EXIT_REASON
                 elif stop_hit:
                     exit_price = position.stop_price
                     exit_reason = "stop_loss"
@@ -198,7 +199,7 @@ def risk_adjusted_score(metrics: BacktestMetrics) -> float:
     if metrics.total_trades == 0:
         return float("-inf")
     drawdown_floor = max(metrics.max_drawdown, MIN_DRAWDOWN_FLOOR)
-    capped_profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(
+    capped_profit_factor = MAX_PROFIT_FACTOR_FOR_SCORING if metrics.profit_factor == float("inf") else min(
         metrics.profit_factor,
         MAX_PROFIT_FACTOR_FOR_SCORING,
     )
