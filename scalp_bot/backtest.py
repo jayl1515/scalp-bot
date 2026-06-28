@@ -7,6 +7,8 @@ from .models import BacktestMetrics, BacktestResult, Position, Trade
 from .risk import ProfitLedger, RiskManager
 from .strategy import ScalpingStrategy
 
+FLOATING_POINT_TOLERANCE = 1e-9
+
 
 class Backtester:
     def __init__(self, config: BotConfig):
@@ -196,6 +198,3 @@ def risk_adjusted_score(metrics: BacktestMetrics) -> float:
     profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(metrics.profit_factor, 5.0)
     trade_quality = metrics.total_trades / (metrics.total_trades + 5)
     return (metrics.net_pnl / drawdown_floor) * max(profit_factor, 0.5) * trade_quality
-
-
-FLOATING_POINT_TOLERANCE = 1e-9

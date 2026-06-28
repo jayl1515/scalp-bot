@@ -39,11 +39,13 @@ class ScalpingStrategy:
         if index <= 0:
             return False
         candle = candles[index]
+        if abs(candle.close) <= 1e-9:
+            return False
         prev = candles[index - 1]
         fast = state.ema_fast[index]
         slow = state.ema_slow[index]
         atr_value = state.atr[index]
-        atr_pct = atr_value / candle.close if candle.close else 0.0
+        atr_pct = atr_value / candle.close
         avg_volume = state.volume_sma[index]
         trend_ok = candle.close > fast > slow
         volatility_ok = self.config.min_atr_pct <= atr_pct <= self.config.max_atr_pct
