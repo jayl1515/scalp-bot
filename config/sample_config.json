@@ -15,7 +15,7 @@
     "max_atr_pct": 0.02,
     "volume_lookback": 20,
     "volume_multiplier": 1.05,
-    "risk_per_trade_pct": 0.01,
+    "risk_per_trade_pct": 0.05,
     "max_position_pct": 1.0,
     "stop_atr_multiple": 1.2,
     "reward_to_risk": 1.4,

@@ -22,7 +22,7 @@ class StrategyConfig:
     max_atr_pct: float = 0.02
     volume_lookback: int = 20
     volume_multiplier: float = 1.05
-    risk_per_trade_pct: float = 0.01
+    risk_per_trade_pct: float = 0.05
     max_position_pct: float = 1.0
     stop_atr_multiple: float = 1.2
     reward_to_risk: float = 1.4
