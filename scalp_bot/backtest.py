@@ -8,6 +8,9 @@ from .risk import ProfitLedger, RiskManager
 from .strategy import ScalpingStrategy
 
 FLOATING_POINT_TOLERANCE = 1e-9
+MIN_DRAWDOWN_FLOOR = 0.05
+MAX_PROFIT_FACTOR_FOR_SCORING = 5.0
+TRADE_QUALITY_SMOOTHING_FACTOR = 5
 
 
 class Backtester:
@@ -194,7 +197,12 @@ def calculate_max_drawdown(equity_curve: list[float]) -> float:
 def risk_adjusted_score(metrics: BacktestMetrics) -> float:
     if metrics.total_trades == 0:
         return float("-inf")
-    drawdown_floor = max(metrics.max_drawdown, 0.05)
-    profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(metrics.profit_factor, 5.0)
-    trade_quality = metrics.total_trades / (metrics.total_trades + 5)
+    drawdown_floor = max(metrics.max_drawdown, MIN_DRAWDOWN_FLOOR)
+    profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(
+        metrics.profit_factor,
+        MAX_PROFIT_FACTOR_FOR_SCORING,
+    )
+    trade_quality = metrics.total_trades / (
+        metrics.total_trades + TRADE_QUALITY_SMOOTHING_FACTOR
+    )
     return (metrics.net_pnl / drawdown_floor) * max(profit_factor, 0.5) * trade_quality
