@@ -51,7 +51,7 @@ class ScalpingStrategy:
         avg_volume = state.volume_sma[index]
         trend_ok = candle.close > fast > slow
         volatility_ok = self.config.min_atr_pct <= atr_pct <= self.config.max_atr_pct
-        volume_ok = candle.volume >= avg_volume * self.config.volume_multiplier if avg_volume else False
+        volume_ok = candle.volume >= avg_volume * self.config.volume_multiplier if avg_volume > 0 else False
         breakout_ok = candle.close > prev.high and candle.close > candle.open
         return trend_ok and volatility_ok and volume_ok and breakout_ok
 

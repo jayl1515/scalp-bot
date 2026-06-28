@@ -198,11 +198,11 @@ def risk_adjusted_score(metrics: BacktestMetrics) -> float:
     if metrics.total_trades == 0:
         return float("-inf")
     drawdown_floor = max(metrics.max_drawdown, MIN_DRAWDOWN_FLOOR)
-    profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(
+    capped_profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(
         metrics.profit_factor,
         MAX_PROFIT_FACTOR_FOR_SCORING,
     )
     trade_quality = metrics.total_trades / (
         metrics.total_trades + TRADE_QUALITY_SMOOTHING_FACTOR
     )
-    return (metrics.net_pnl / drawdown_floor) * max(profit_factor, 0.5) * trade_quality
+    return (metrics.net_pnl / drawdown_floor) * max(capped_profit_factor, 0.5) * trade_quality
