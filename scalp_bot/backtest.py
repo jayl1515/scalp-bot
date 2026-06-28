@@ -109,7 +109,7 @@ class Backtester:
             if quantity <= 0:
                 continue
             notional = entry_price * quantity
-            if notional > ledger.trading_balance + 1e-9:
+            if notional > ledger.trading_balance + FLOATING_POINT_TOLERANCE:
                 continue
             take_profit_price = entry_price + (entry_price - stop_price) * self.config.strategy.reward_to_risk
             position = Position(
@@ -191,8 +191,11 @@ def calculate_max_drawdown(equity_curve: list[float]) -> float:
 
 def risk_adjusted_score(metrics: BacktestMetrics) -> float:
     if metrics.total_trades == 0:
-        return -999.0
+        return float("-inf")
     drawdown_floor = max(metrics.max_drawdown, 0.05)
     profit_factor = 0.0 if metrics.profit_factor == float("inf") else min(metrics.profit_factor, 5.0)
     trade_quality = metrics.total_trades / (metrics.total_trades + 5)
     return (metrics.net_pnl / drawdown_floor) * max(profit_factor, 0.5) * trade_quality
+
+
+FLOATING_POINT_TOLERANCE = 1e-9

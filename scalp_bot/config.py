@@ -55,7 +55,7 @@ class BotConfig:
     optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
 
 
-def _merge_dataclass(cls: type, data: dict[str, Any] | None):
+def _merge_dataclass(cls: type, data: dict[str, Any] | None) -> Any:
     if not data:
         return cls()
     defaults = cls()
