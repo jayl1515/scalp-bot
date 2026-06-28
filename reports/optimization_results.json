@@ -1,0 +1,152 @@
+{
+  "best_parameters": {
+    "ema_fast_period": 6,
+    "ema_slow_period": 18,
+    "volume_multiplier": 1.0,
+    "stop_atr_multiple": 1.2,
+    "reward_to_risk": 1.4,
+    "max_hold_bars": 8
+  },
+  "best_metrics": {
+    "win_rate": 73.68421052631578,
+    "net_pnl": 1.4351044353524738,
+    "profit_factor": 9.451351173444676,
+    "max_drawdown": 0.11598846416333686,
+    "total_trades": 19,
+    "average_win": 0.11463658051087926,
+    "average_loss": -0.03396153835996715,
+    "ending_trading_balance": 20.0,
+    "profit_wallet_balance": 1.4351044353524678,
+    "total_equity": 21.435104435352468,
+    "stopped_days": 0,
+    "risk_adjusted_score": 48.97574740942051
+  },
+  "top_results": [
+    {
+      "parameters": {
+        "ema_fast_period": 6,
+        "ema_slow_period": 18,
+        "volume_multiplier": 1.0,
+        "stop_atr_multiple": 1.2,
+        "reward_to_risk": 1.4,
+        "max_hold_bars": 8
+      },
+      "metrics": {
+        "win_rate": 73.68421052631578,
+        "net_pnl": 1.4351044353524738,
+        "profit_factor": 9.451351173444676,
+        "max_drawdown": 0.11598846416333686,
+        "total_trades": 19,
+        "average_win": 0.11463658051087926,
+        "average_loss": -0.03396153835996715,
+        "ending_trading_balance": 20.0,
+        "profit_wallet_balance": 1.4351044353524678,
+        "total_equity": 21.435104435352468,
+        "stopped_days": 0,
+        "risk_adjusted_score": 48.97574740942051
+      },
+      "score": 48.97574740942051
+    },
+    {
+      "parameters": {
+        "ema_fast_period": 6,
+        "ema_slow_period": 18,
+        "volume_multiplier": 1.0,
+        "stop_atr_multiple": 1.2,
+        "reward_to_risk": 1.4,
+        "max_hold_bars": 10
+      },
+      "metrics": {
+        "win_rate": 73.68421052631578,
+        "net_pnl": 1.4351044353524738,
+        "profit_factor": 9.451351173444676,
+        "max_drawdown": 0.11598846416333686,
+        "total_trades": 19,
+        "average_win": 0.11463658051087926,
+        "average_loss": -0.03396153835996715,
+        "ending_trading_balance": 20.0,
+        "profit_wallet_balance": 1.4351044353524678,
+        "total_equity": 21.435104435352468,
+        "stopped_days": 0,
+        "risk_adjusted_score": 48.97574740942051
+      },
+      "score": 48.97574740942051
+    },
+    {
+      "parameters": {
+        "ema_fast_period": 8,
+        "ema_slow_period": 18,
+        "volume_multiplier": 1.0,
+        "stop_atr_multiple": 1.2,
+        "reward_to_risk": 1.4,
+        "max_hold_bars": 8
+      },
+      "metrics": {
+        "win_rate": 73.68421052631578,
+        "net_pnl": 1.3999435245864105,
+        "profit_factor": 9.244288051666247,
+        "max_drawdown": 0.11598846416333686,
+        "total_trades": 19,
+        "average_win": 0.11212508688473188,
+        "average_loss": -0.03396153835996715,
+        "ending_trading_balance": 20.0,
+        "profit_wallet_balance": 1.399943524586405,
+        "total_equity": 21.399943524586405,
+        "stopped_days": 0,
+        "risk_adjusted_score": 47.77581251831209
+      },
+      "score": 47.77581251831209
+    },
+    {
+      "parameters": {
+        "ema_fast_period": 10,
+        "ema_slow_period": 18,
+        "volume_multiplier": 1.0,
+        "stop_atr_multiple": 1.2,
+        "reward_to_risk": 1.4,
+        "max_hold_bars": 8
+      },
+      "metrics": {
+        "win_rate": 73.68421052631578,
+        "net_pnl": 1.395366053960039,
+        "profit_factor": 9.217331259674944,
+        "max_drawdown": 0.11598846416333686,
+        "total_trades": 19,
+        "average_win": 0.11179812469713392,
+        "average_loss": -0.03396153835996715,
+        "ending_trading_balance": 20.0,
+        "profit_wallet_balance": 1.3953660539600357,
+        "total_equity": 21.395366053960036,
+        "stopped_days": 0,
+        "risk_adjusted_score": 47.61959737490605
+      },
+      "score": 47.61959737490605
+    },
+    {
+      "parameters": {
+        "ema_fast_period": 6,
+        "ema_slow_period": 21,
+        "volume_multiplier": 1.0,
+        "stop_atr_multiple": 1.2,
+        "reward_to_risk": 1.4,
+        "max_hold_bars": 8
+      },
+      "metrics": {
+        "win_rate": 73.68421052631578,
+        "net_pnl": 1.39181846411603,
+        "profit_factor": 9.196439450791571,
+        "max_drawdown": 0.11598846416333686,
+        "total_trades": 19,
+        "average_win": 0.11154472542256186,
+        "average_loss": -0.03396153835996715,
+        "ending_trading_balance": 20.0,
+        "profit_wallet_balance": 1.3918184641160245,
+        "total_equity": 21.391818464116025,
+        "stopped_days": 0,
+        "risk_adjusted_score": 47.498528928713334
+      },
+      "score": 47.498528928713334
+    }
+  ],
+  "evaluated_combinations": 144
+}
