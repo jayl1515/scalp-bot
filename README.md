@@ -1,2 +1,3 @@
 # scalp-bot
-a scalping bot for crypto focusing on small gains consistently with very high success rate 
+
+A small Python framework for experimenting with fixed-capital crypto scalping ideas on historical data.
