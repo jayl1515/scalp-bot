@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>scalp-bot control panel</title>
+  <link rel="stylesheet" href="/static/panel.css" />
+</head>
+<body>
+  <header class="topbar">
+    <span class="logo">⚡ scalp-bot</span>
+    <div id="auth-area">
+      <button id="btn-set-token" class="btn-sm" onclick="promptToken()">Set Token</button>
+    </div>
+  </header>
+
+  <!-- Status card -->
+  <section class="card" id="status-card">
+    <h2>Status</h2>
+    <div class="status-row">
+      <span id="status-badge" class="badge badge-stopped">Stopped</span>
+      <span id="mode-badge" class="badge badge-paper">Paper</span>
+      <span id="ks-badge" class="badge badge-ks hidden">Kill Switch ON</span>
+    </div>
+    <p class="meta">Started: <span id="started-at">—</span></p>
+    <p class="meta">Stopped: <span id="stopped-at">—</span></p>
+    <p class="meta">Last Signal: <span id="last-signal">—</span></p>
+    <p class="meta">Last Trade: <span id="last-trade">—</span></p>
+  </section>
+
+  <!-- Controls -->
+  <section class="card">
+    <h2>Controls</h2>
+    <div class="btn-row">
+      <button id="btn-start" class="btn btn-start" onclick="botAction('start')">▶ Start</button>
+      <button id="btn-stop"  class="btn btn-stop"  onclick="botAction('stop')">■ Stop</button>
+    </div>
+    <button class="btn btn-ks" onclick="triggerKillSwitch()">🛑 Kill Switch</button>
+    <button class="btn btn-sm btn-ks-reset hidden" id="btn-ks-reset" onclick="resetKillSwitch()">Reset Kill Switch</button>
+  </section>
+
+  <!-- Mode -->
+  <section class="card">
+    <h2>Trading Mode</h2>
+    <div class="btn-row">
+      <button class="btn btn-paper" onclick="setMode('paper')">Paper</button>
+      <button class="btn btn-live"  onclick="confirmLive()">Live ⚠</button>
+    </div>
+    <p class="hint">Live mode places real orders. You will be asked to confirm.</p>
+  </section>
+
+  <!-- Settings -->
+  <section class="card" id="settings-card">
+    <h2>Settings <button class="btn-sm" onclick="toggleSettings()">▼</button></h2>
+    <div id="settings-body" class="hidden">
+      <form id="settings-form" onsubmit="saveSettings(event)">
+        <label>Base Capital ($)
+          <input type="number" name="base_capital" min="1" step="0.01" placeholder="20.00" />
+        </label>
+        <fieldset>
+          <legend>Risk</legend>
+          <label>Max Daily Loss %
+            <input type="number" name="risk.max_daily_loss_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+          </label>
+          <label>Max Consecutive Losses
+            <input type="number" name="risk.max_consecutive_losses" min="1" max="100" step="1" placeholder="3" />
+          </label>
+          <label>Cooldown Bars
+            <input type="number" name="risk.cooldown_bars" min="0" max="1000" step="1" placeholder="5" />
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Strategy</legend>
+          <label>EMA Fast Period
+            <input type="number" name="strategy.ema_fast_period" min="2" max="500" step="1" placeholder="8" />
+          </label>
+          <label>EMA Slow Period
+            <input type="number" name="strategy.ema_slow_period" min="3" max="500" step="1" placeholder="21" />
+          </label>
+          <label>Risk per Trade %
+            <input type="number" name="strategy.risk_per_trade_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+          </label>
+          <label>Max Position %
+            <input type="number" name="strategy.max_position_pct" min="0.01" max="1" step="0.01" placeholder="1.0" />
+          </label>
+          <label>Stop ATR Multiple
+            <input type="number" name="strategy.stop_atr_multiple" min="0.1" max="10" step="0.1" placeholder="1.2" />
+          </label>
+          <label>Reward / Risk
+            <input type="number" name="strategy.reward_to_risk" min="0.1" max="20" step="0.1" placeholder="1.4" />
+          </label>
+        </fieldset>
+        <button type="submit" class="btn btn-save">💾 Save Settings</button>
+      </form>
+      <div id="settings-msg" class="msg hidden"></div>
+    </div>
+  </section>
+
+  <!-- Logs -->
+  <section class="card">
+    <h2>Audit Log <button class="btn-sm" onclick="loadLogs()">↻ Refresh</button></h2>
+    <ul id="log-list" class="log-list"></ul>
+  </section>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/panel.js"></script>
+</body>
+</html>
