@@ -106,7 +106,7 @@ async function botAction(action) {
     renderStatus(data.status);
     toast(data.message || action + " OK");
   } else {
-    toast((data.error || "Error") , true);
+    toast((data.error || "Error"), true);
   }
   if (btn) btn.disabled = false;
   loadLogs();
