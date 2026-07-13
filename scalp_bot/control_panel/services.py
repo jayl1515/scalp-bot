@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import copy
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -194,7 +194,7 @@ class ControlPanelService:
         if self.state.active_paper_run_id:
             raise ValueError("A paper session is already active.")
         merged_config = self.effective_config_payload(payload.get("config_overrides") or {})
-        title = payload.get("title") or f"Paper session {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        title = payload.get("title") or f"Paper session {datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}"
         run_id = self.database.create_run(
             run_type="paper",
             status="running",

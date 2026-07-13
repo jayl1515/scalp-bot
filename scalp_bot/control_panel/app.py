@@ -73,6 +73,10 @@ def create_app(
             raise ValueError("Request body must be a JSON object")
         return body
 
+    def _value_error_response(action: str, exc: ValueError, *, status_code: int, public_error: str):
+        audit.record(action, _actor(), "rejected", str(exc))
+        return jsonify({"error": public_error}), status_code
+
     @app.get("/")
     def index():
         return render_template("index.html")
@@ -109,7 +113,7 @@ def create_app(
 
     @app.get("/api/health")
     def health():
-        return jsonify({"status": "ok", "database": str(resolved_database_path)})
+        return jsonify({"status": "ok"})
 
     @app.get("/api/app")
     @require_auth
@@ -243,15 +247,14 @@ def create_app(
         try:
             body = _json_body()
         except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
+            return _value_error_response("backtest", exc, status_code=400, public_error="Request body must be a JSON object.")
         errors = validate_settings(body.get("config_overrides") or {})
         if errors:
             return jsonify({"errors": errors}), 422
         try:
             run = service.run_backtest(body)
         except ValueError as exc:
-            audit.record("backtest", _actor(), "rejected", str(exc))
-            return jsonify({"error": str(exc)}), 400
+            return _value_error_response("backtest", exc, status_code=400, public_error="Unable to create backtest.")
         audit.record("backtest", _actor(), "success", run["id"])
         return jsonify(run), 201
 
@@ -274,7 +277,7 @@ def create_app(
         try:
             comparison = service.compare_runs(run_ids)
         except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
+            return _value_error_response("compare_runs", exc, status_code=400, public_error="Unable to compare the selected runs.")
         return jsonify(comparison)
 
     @app.get("/api/runs/<run_id>")
@@ -303,8 +306,7 @@ def create_app(
                 return jsonify({"errors": errors}), 422
             session = service.start_paper_session(body)
         except ValueError as exc:
-            audit.record("paper_start", _actor(), "rejected", str(exc))
-            return jsonify({"error": str(exc)}), 409
+            return _value_error_response("paper_start", exc, status_code=409, public_error="Unable to start the paper session.")
         audit.record("paper_start", _actor(), "success", session["id"])
         return jsonify(session), 201
 
@@ -315,8 +317,7 @@ def create_app(
             body = _json_body()
             signal = service.log_paper_signal(body)
         except ValueError as exc:
-            audit.record("paper_signal", _actor(), "rejected", str(exc))
-            return jsonify({"error": str(exc)}), 409
+            return _value_error_response("paper_signal", exc, status_code=409, public_error="Unable to log the paper signal.")
         audit.record("paper_signal", _actor(), "success", signal.get("symbol") or "signal")
         return jsonify(signal), 201
 
@@ -327,8 +328,7 @@ def create_app(
             body = _json_body()
             trade = service.log_paper_trade(body)
         except ValueError as exc:
-            audit.record("paper_trade", _actor(), "rejected", str(exc))
-            return jsonify({"error": str(exc)}), 409
+            return _value_error_response("paper_trade", exc, status_code=409, public_error="Unable to log the paper trade.")
         audit.record("paper_trade", _actor(), "success", trade.get("symbol") or "trade")
         return jsonify(trade), 201
 
@@ -339,8 +339,7 @@ def create_app(
             body = _json_body()
             session = service.stop_paper_session(body)
         except ValueError as exc:
-            audit.record("paper_stop", _actor(), "rejected", str(exc))
-            return jsonify({"error": str(exc)}), 409
+            return _value_error_response("paper_stop", exc, status_code=409, public_error="Unable to stop the paper session.")
         audit.record("paper_stop", _actor(), "success", session["id"])
         return jsonify(session)
 

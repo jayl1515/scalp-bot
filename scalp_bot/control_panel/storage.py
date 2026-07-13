@@ -215,27 +215,23 @@ class AppDatabase:
         completed_at: str | None = None,
         notes: str | None = None,
     ) -> None:
-        fields: list[str] = ["updated_at = ?"]
-        values: list[Any] = [utc_now_iso()]
+        safe_assignments: list[tuple[str, Any]] = [("updated_at = ?", utc_now_iso())]
         if status is not None:
-            fields.append("status = ?")
-            values.append(status)
+            safe_assignments.append(("status = ?", status))
         if summary is not None:
-            fields.append("summary_json = ?")
-            values.append(self._encode(summary))
+            safe_assignments.append(("summary_json = ?", self._encode(summary)))
         if metrics is not None:
-            fields.append("metrics_json = ?")
-            values.append(self._encode(metrics))
+            safe_assignments.append(("metrics_json = ?", self._encode(metrics)))
         if completed_at is not None:
-            fields.append("completed_at = ?")
-            values.append(completed_at)
+            safe_assignments.append(("completed_at = ?", completed_at))
         if notes is not None:
-            fields.append("notes = ?")
-            values.append(notes)
+            safe_assignments.append(("notes = ?", notes))
+        assignment_sql = ", ".join(fragment for fragment, _ in safe_assignments)
+        values = [value for _, value in safe_assignments]
         values.append(run_id)
         with self._lock, self._connect() as connection:
             connection.execute(
-                f"UPDATE runs SET {', '.join(fields)} WHERE id = ?",
+                f"UPDATE runs SET {assignment_sql} WHERE id = ?",
                 values,
             )
 

@@ -191,7 +191,7 @@ async function botAction(action) {
 
 async function setMode(mode) {
   if (mode === "live") {
-    const confirmLive = window.prompt('Type LIVE to confirm switching to live mode:', "");
+    const confirmLive = window.prompt("Type LIVE to confirm switching to live mode:", "");
     if (confirmLive !== "LIVE") {
       toast("Live mode not activated");
       return;

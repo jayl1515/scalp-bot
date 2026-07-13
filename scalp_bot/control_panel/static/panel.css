@@ -12,6 +12,7 @@
   --warning: #f59e0b;
   --radius: 18px;
   --shadow: 0 20px 60px rgba(2, 8, 23, 0.42);
+  --safe-bottom: calc(0.7rem + env(safe-area-inset-bottom));
 }
 
 *,
@@ -423,7 +424,7 @@ th {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.35rem;
-  padding: 0.7rem 0.75rem calc(0.7rem + env(safe-area-inset-bottom));
+  padding: 0.7rem 0.75rem var(--safe-bottom);
   background: rgba(2, 6, 23, 0.94);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(16px);
