@@ -19,6 +19,7 @@ class BotState:
     last_signal: dict[str, Any] | None = None
     last_trade: dict[str, Any] | None = None
     settings_override: dict[str, Any] = field(default_factory=dict)
+    active_paper_run_id: str | None = None
 
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
 

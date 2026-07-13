@@ -22,9 +22,9 @@ def state():
 
 
 @pytest.fixture
-def app(state):
+def app(state, tmp_path):
     """Flask test app backed by an isolated BotState."""
-    application = create_app(state=state)
+    application = create_app(state=state, database_path=tmp_path / "control_panel.db")
     application.config["TESTING"] = True
     return application
 
@@ -63,7 +63,7 @@ class TestHealth:
     def test_health_returns_ok(self, client):
         r = client.get("/api/health")
         assert r.status_code == 200
-        assert r.get_json() == {"status": "ok"}
+        assert r.get_json()["status"] == "ok"
 
     def test_health_no_auth_required(self, client, monkeypatch):
         monkeypatch.setenv("CONTROL_PANEL_TOKEN", "secret")
@@ -293,6 +293,25 @@ class TestSettingsEndpoint:
         assert r.status_code == 200
         assert state.settings_override["base_capital"] == 50.0
 
+    def test_settings_persist_across_app_restarts(self, state, tmp_path):
+        db_path = tmp_path / "persistent.db"
+        first_app = create_app(state=state, database_path=db_path)
+        first_app.config["TESTING"] = True
+        first_client = first_app.test_client()
+        first_client.put(
+            "/api/settings",
+            data=json.dumps({"base_capital": 50.0}),
+            content_type="application/json",
+        )
+
+        reloaded_state = BotState()
+        second_app = create_app(state=reloaded_state, database_path=db_path)
+        second_app.config["TESTING"] = True
+        second_client = second_app.test_client()
+        response = second_client.get("/api/settings")
+        assert response.status_code == 200
+        assert response.get_json()["base_capital"] == 50.0
+
     def test_put_invalid_settings_returns_422(self, client):
         payload = {"base_capital": -100}
         r = client.put(
@@ -376,3 +395,115 @@ class TestUIRoute:
         assert r.status_code == 200
         assert b"scalp-bot" in r.data
         assert b"<html" in r.data
+
+    def test_manifest_is_available(self, client):
+        r = client.get("/manifest.webmanifest")
+        assert r.status_code == 200
+        assert r.mimetype == "application/manifest+json"
+
+
+class TestAppMetadata:
+    def test_app_metadata_includes_dataset_summary(self, client):
+        r = client.get("/api/app")
+        assert r.status_code == 200
+        payload = r.get_json()
+        assert payload["dataset"]["total_candles"] > 0
+        assert "dashboard" in payload["available_sections"]
+
+
+class TestBacktestRuns:
+    def test_backtest_run_is_persisted(self, client):
+        r = client.post(
+            "/api/backtests",
+            data=json.dumps({"title": "Range check", "start_date": "2024-01-01", "end_date": "2024-01-02"}),
+            content_type="application/json",
+        )
+        assert r.status_code == 201
+        run = r.get_json()
+        assert run["run_type"] == "backtest"
+        assert run["status"] == "completed"
+        assert run["trade_count"] > 0
+
+        detail = client.get(f"/api/runs/{run['id']}")
+        assert detail.status_code == 200
+        assert detail.get_json()["config"]["base_capital"] == 20.0
+
+    def test_duplicate_backtests_keep_separate_rows(self, client):
+        first = client.post(
+            "/api/backtests",
+            data=json.dumps({"start_date": "2024-01-01", "end_date": "2024-01-02"}),
+            content_type="application/json",
+        )
+        second = client.post(
+            "/api/backtests",
+            data=json.dumps({"start_date": "2024-01-01", "end_date": "2024-01-02"}),
+            content_type="application/json",
+        )
+        assert first.status_code == 201
+        assert second.status_code == 201
+        assert first.get_json()["id"] != second.get_json()["id"]
+
+        listing = client.get("/api/runs?type=backtest").get_json()
+        ids = [entry["id"] for entry in listing]
+        assert first.get_json()["id"] in ids
+        assert second.get_json()["id"] in ids
+
+    def test_compare_runs_endpoint(self, client):
+        first = client.post(
+            "/api/backtests",
+            data=json.dumps({"title": "A", "start_date": "2024-01-01T00:00:00", "end_date": "2024-01-01T05:59:00"}),
+            content_type="application/json",
+        ).get_json()
+        second = client.post(
+            "/api/backtests",
+            data=json.dumps({"title": "B", "start_date": "2024-01-01T06:00:00", "end_date": "2024-01-01T11:59:00"}),
+            content_type="application/json",
+        ).get_json()
+        response = client.get(f"/api/runs/compare?ids={first['id']},{second['id']}")
+        assert response.status_code == 200
+        assert len(response.get_json()["runs"]) == 2
+
+
+class TestPaperRuns:
+    def test_paper_session_persists_events_and_trades(self, client):
+        started = client.post(
+            "/api/paper/start",
+            data=json.dumps({"title": "Morning session"}),
+            content_type="application/json",
+        )
+        assert started.status_code == 201
+        run_id = started.get_json()["id"]
+
+        signal = client.post(
+            "/api/paper/signal",
+            data=json.dumps({"symbol": "BTCUSDT", "bias": "long", "note": "Breakout"}),
+            content_type="application/json",
+        )
+        assert signal.status_code == 201
+
+        trade = client.post(
+            "/api/paper/trade",
+            data=json.dumps({
+                "symbol": "BTCUSDT",
+                "side": "long",
+                "quantity": 1.0,
+                "entry_price": 100.0,
+                "exit_price": 101.0,
+                "note": "Target hit",
+            }),
+            content_type="application/json",
+        )
+        assert trade.status_code == 201
+
+        stopped = client.post(
+            "/api/paper/stop",
+            data=json.dumps({"notes": "Done for the day"}),
+            content_type="application/json",
+        )
+        assert stopped.status_code == 200
+        detail = client.get(f"/api/runs/{run_id}")
+        assert detail.status_code == 200
+        payload = detail.get_json()
+        assert payload["status"] == "stopped"
+        assert payload["trade_count"] == 1
+        assert payload["event_count"] >= 3
