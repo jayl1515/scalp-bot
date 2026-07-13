@@ -64,8 +64,7 @@ def _merge_dataclass(cls: type, data: dict[str, Any] | None) -> Any:
     return defaults
 
 
-def load_config(path: str | Path) -> BotConfig:
-    raw = json.loads(Path(path).read_text())
+def build_config(raw: dict[str, Any]) -> BotConfig:
     return BotConfig(
         base_capital=float(raw.get("base_capital", 20.0)),
         fee_rate=float(raw.get("fee_rate", 0.001)),
@@ -77,3 +76,11 @@ def load_config(path: str | Path) -> BotConfig:
             grid=raw.get("optimization", {}).get("grid", OptimizationConfig().grid),
         ),
     )
+
+
+def load_config_data(path: str | Path) -> dict[str, Any]:
+    return json.loads(Path(path).read_text())
+
+
+def load_config(path: str | Path) -> BotConfig:
+    return build_config(load_config_data(path))

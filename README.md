@@ -87,9 +87,9 @@ This framework uses OHLCV candles, not tick-by-tick data. If a candle touches bo
 
 ---
 
-## Web control panel
+## Installable phone app control panel
 
-A lightweight, mobile-friendly control panel lets you monitor and manage the bot from your phone or browser.
+The control panel is now an **installable app-style interface** for phones and tablets. It keeps the existing bot controls, adds polished app navigation, and stores backtests, paper sessions, settings, and audit history in a persistent SQLite database.
 
 ### Required environment variables
 
@@ -98,6 +98,9 @@ A lightweight, mobile-friendly control panel lets you monitor and manage the bot
 | `CONTROL_PANEL_TOKEN` | Recommended | ****** protecting all control endpoints. Omit only for local dev. |
 | `CONTROL_PANEL_HOST` | Optional | Server bind address (default `0.0.0.0`) |
 | `CONTROL_PANEL_PORT` | Optional | Server port (default `5000`) |
+| `CONTROL_PANEL_DB_PATH` | Optional | SQLite database path for persistent app state and run history (default `instance/scalp_bot.db`) |
+| `SCALP_BOT_CONFIG_PATH` | Optional | Config JSON used as the base snapshot for backtests and paper sessions |
+| `SCALP_BOT_DATA_PATH` | Optional | OHLCV CSV used by the in-app backtest runner |
 | `FLASK_SECRET_KEY` | Optional | Secret key for Flask sessions (set to a random string in production) |
 | `FLASK_DEBUG` | Optional | Set to `1` to enable Flask debug mode (never in production) |
 
@@ -112,7 +115,7 @@ CONTROL_PANEL_TOKEN=my-secret python -m scalp_bot.control_panel
 # → Listening on http://0.0.0.0:5000
 ```
 
-Open http://localhost:5000 in your browser.
+Open http://localhost:5000 in your browser, then install it to your phone home screen for an app-like experience.
 
 ### Open from your phone (same Wi-Fi network)
 
@@ -124,17 +127,36 @@ Open http://localhost:5000 in your browser.
    - Example: `http://192.168.1.42:5000`
 4. Tap **Set Token** in the top-right corner and enter your `CONTROL_PANEL_TOKEN`.
 
-### Add to Home Screen
+### Install on your phone
 
 **iOS (Safari)**
 1. Open the URL in Safari.
 2. Tap the Share icon → **Add to Home Screen**.
-3. Tap **Add**. The panel opens like a native app.
+3. Tap **Add**. The control panel opens in standalone app mode.
 
 **Android (Chrome)**
 1. Open the URL in Chrome.
 2. Tap the three-dot menu → **Add to Home screen**.
 3. Tap **Add**.
+
+### What is persisted
+
+- Bot mode, kill-switch state, last logged paper signal, and last logged paper trade
+- Custom settings overrides saved from the app
+- Every backtest run with its own unique ID, date range, config snapshot, metrics, trades, and event trail
+- Every paper session with its own unique ID, event log, and trade journal
+- Audit history for control actions
+
+Running the same backtest range multiple times is safe because each run is saved as a separate database record.
+
+### App API highlights
+
+- `POST /api/backtests` — run a backtest for a chosen date range and save it
+- `GET /api/runs` — list backtests and paper sessions
+- `GET /api/runs/<run_id>` — inspect a specific run, including trades and events
+- `GET /api/runs/compare?ids=<id1>,<id2>` — compare saved runs
+- `POST /api/paper/start`, `/api/paper/signal`, `/api/paper/trade`, `/api/paper/stop` — manage persistent paper sessions
+- `GET /api/app` — load app metadata, dataset range, and recent runs
 
 ### Safety notes for live mode
 
@@ -151,16 +173,20 @@ Open http://localhost:5000 in your browser.
 
 ```
 scalp_bot/control_panel/
-  app.py          — Flask app factory and all API routes
-  state.py        — Thread-safe in-memory bot state
+  app.py          — Flask app factory and API routes for the installable app
+  services.py     — service layer for backtests, paper runs, and run history
+  storage.py      — SQLite persistence for app state, runs, trades, and events
+  state.py        — thread-safe runtime bot state
   auth.py         — Bearer-token auth decorator
-  audit.py        — Audit/action log (in-memory, newest-first)
-  validation.py   — Server-side settings validation
+  audit.py        — audit log abstraction backed by SQLite
+  validation.py   — server-side settings validation
   templates/
-    index.html    — Mobile-first single-page UI
+    index.html    — multi-screen app shell
   static/
-    panel.css     — Responsive dark-theme stylesheet
-    panel.js      — Vanilla JS: status polling, actions, settings form
+    panel.css     — polished mobile app styling
+    panel.js      — app navigation, history views, and API actions
+    sw.js         — service worker for install/caching
+    icon.svg      — app icon
 tests/
-  test_control_panel.py — 45 tests covering all endpoints, auth, validation
+  test_control_panel.py — app, persistence, history, and control API coverage
 ```
