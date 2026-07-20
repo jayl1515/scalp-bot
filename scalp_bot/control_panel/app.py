@@ -36,7 +36,7 @@ def create_app(
 
     repo_root = _repo_root()
     resolved_config_path = Path(config_path or os.environ.get("SCALP_BOT_CONFIG_PATH", repo_root / "config" / "sample_config.json"))
-    resolved_data_path = Path(data_path or os.environ.get("SCALP_BOT_DATA_PATH", repo_root / "data" / "sample_ohlcv.csv"))
+    resolved_data_path = Path(data_path or os.environ.get("SCALP_BOT_DATA_PATH", repo_root / "data" / "btcusdt_1h.csv"))
     resolved_database_path = Path(database_path or os.environ.get("CONTROL_PANEL_DB_PATH", _default_database_path()))
 
     template_dir = Path(__file__).parent / "templates"
