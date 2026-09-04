@@ -120,6 +120,60 @@ function renderDataset(dataset) {
   document.getElementById("dataset-count").textContent = fmtNumber(dataset.total_candles);
 }
 
+function selectedMarketQuery() {
+  const form = document.getElementById("backtest-form");
+  const query = new URLSearchParams({
+    exchange: form.elements.exchange.value,
+    symbol: form.elements.symbol.value,
+    timeframe: form.elements.timeframe.value,
+  });
+  return query.toString();
+}
+
+async function refreshMarketDataStatus() {
+  const { ok, data } = await api("GET", `/api/market-data/status?${selectedMarketQuery()}`);
+  if (!ok) {
+    document.getElementById("cache-status").textContent = "Unavailable";
+    document.getElementById("cache-updated").textContent = "—";
+    return;
+  }
+  document.getElementById("cache-status").textContent = data.exists === false ? "Not cached" : "Cached";
+  document.getElementById("cache-updated").textContent = fmtDate(data.updated_at);
+}
+
+function renderMarketOptions(options = {}) {
+  const fields = [
+    ["backtest-exchange", options.exchanges || [], "binance", "Binance"],
+    ["backtest-market-type", options.market_types || [], "spot", "Spot"],
+    ["backtest-timeframe", options.timeframes || [], "csv", "Dataset timeframe"],
+  ];
+  for (const [id, values, fallbackValue, fallbackLabel] of fields) {
+    const select = document.getElementById(id);
+    const currentValue = select.value;
+    const availableValues = values.length ? values : [fallbackValue];
+    select.innerHTML = availableValues.map((value) => {
+      const label = value === fallbackValue ? fallbackLabel : value;
+      return `<option value="${value}">${label}</option>`;
+    }).join("");
+    select.value = availableValues.includes(currentValue) ? currentValue : availableValues[0];
+  }
+  const symbolInput = document.getElementById("backtest-symbol");
+  const symbolList = document.getElementById("backtest-symbol-options");
+  symbolList.innerHTML = (options.symbols || []).map((symbol) => `<option value="${symbol}"></option>`).join("");
+  if (!symbolInput.value) symbolInput.value = options.symbols?.[0] || "sample";
+  syncMarketSelection();
+}
+
+function syncMarketSelection() {
+  const symbolInput = document.getElementById("backtest-symbol");
+  const timeframe = document.getElementById("backtest-timeframe");
+  if (symbolInput.value === "sample") {
+    timeframe.value = "csv";
+  } else if (timeframe.value === "csv") {
+    timeframe.value = "1h";
+  }
+}
+
 function showScreen(name) {
   document.querySelectorAll(".screen").forEach((screen) => {
     screen.classList.toggle("active", screen.id === `screen-${name}`);
@@ -139,6 +193,29 @@ function collectFormData(form) {
     else raw[element.name] = element.value;
   }
   return raw;
+}
+
+function formatDateInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function applyDatePreset(days) {
+  const form = document.getElementById("backtest-form");
+  const start = form.elements.start_date;
+  const end = form.elements.end_date;
+  if (days === "clear") {
+    start.value = "";
+    end.value = "";
+    return;
+  }
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - Number(days));
+  start.value = formatDateInput(startDate);
+  end.value = formatDateInput(endDate);
 }
 
 function nestDotKeys(payload) {
@@ -169,6 +246,8 @@ async function refreshApp() {
   }
   renderStatus(data.state);
   renderDataset(data.dataset);
+  renderMarketOptions(data.market_options);
+  await refreshMarketDataStatus();
   viewState.latestRuns = data.recent_runs || [];
   renderRunCards(document.getElementById("dashboard-runs"), viewState.latestRuns, { compact: true });
 }
@@ -220,8 +299,20 @@ async function resetKillSwitch() {
 async function submitBacktest(event) {
   event.preventDefault();
   const raw = collectFormData(event.target);
+  if ((raw.start_date && !raw.end_date) || (!raw.start_date && raw.end_date)) {
+    toast("Choose both a start and end date, or leave both blank", true);
+    return;
+  }
+  if (raw.start_date && raw.end_date && raw.start_date > raw.end_date) {
+    toast("Start date must be before end date", true);
+    return;
+  }
   const payload = {
     title: raw.title,
+    exchange: raw.exchange,
+    market_type: raw.market_type,
+    symbol: raw.symbol,
+    timeframe: raw.timeframe,
     start_date: raw.start_date,
     end_date: raw.end_date,
     notes: raw.notes,
@@ -591,8 +682,15 @@ function wireEvents() {
   document.getElementById("btn-paper-stop").addEventListener("click", stopPaperSession);
   document.getElementById("history-type").addEventListener("change", loadRuns);
   document.getElementById("history-status").addEventListener("change", loadRuns);
+  document.getElementById("backtest-symbol").addEventListener("input", syncMarketSelection);
+  document.getElementById("backtest-symbol").addEventListener("change", refreshMarketDataStatus);
+  document.getElementById("backtest-exchange").addEventListener("change", refreshMarketDataStatus);
+  document.getElementById("backtest-timeframe").addEventListener("change", refreshMarketDataStatus);
 
   document.getElementById("backtest-form").addEventListener("submit", submitBacktest);
+  document.querySelectorAll("[data-date-preset]").forEach((button) => {
+    button.addEventListener("click", () => applyDatePreset(button.dataset.datePreset));
+  });
   document.getElementById("paper-start-form").addEventListener("submit", startPaperSession);
   document.getElementById("paper-signal-form").addEventListener("submit", logPaperSignal);
   document.getElementById("paper-trade-form").addEventListener("submit", logPaperTrade);

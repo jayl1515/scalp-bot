@@ -63,6 +63,7 @@
           <div>
             <p class="eyebrow">Controls</p>
             <h2>Safety-first execution</h2>
+            <p class="helper-copy">Use paper mode while validating ideas. Live mode should only be enabled after backtests and paper sessions look stable.</p>
           </div>
         </div>
         <div class="button-grid">
@@ -98,6 +99,14 @@
             <strong id="dataset-count">—</strong>
           </div>
           <div>
+            <span class="info-label">Cache status</span>
+            <strong id="cache-status">—</strong>
+          </div>
+          <div>
+            <span class="info-label">Last updated</span>
+            <strong id="cache-updated">—</strong>
+          </div>
+          <div>
             <span class="info-label">Token</span>
             <strong id="token-status">Not set</strong>
           </div>
@@ -122,6 +131,7 @@
           <div>
             <p class="eyebrow">Backtest studio</p>
             <h2>Run custom date-range tests</h2>
+            <p class="helper-copy">Pick a date range and optional overrides to compare ideas. Leave fields blank to use the current saved defaults.</p>
           </div>
         </div>
         <form id="backtest-form" class="form-stack">
@@ -129,6 +139,35 @@
             Run title
             <input name="title" type="text" placeholder="January momentum check" />
           </label>
+          <div class="split-grid">
+            <label>
+              Exchange
+              <select id="backtest-exchange" name="exchange">
+                <option value="binance">Binance</option>
+              </select>
+              <span class="field-note">The exchange providing historical candles. Binance and Kraken are available for this milestone.</span>
+            </label>
+            <label>
+              Market type
+              <select id="backtest-market-type" name="market_type">
+                <option value="spot">Spot</option>
+              </select>
+              <span class="field-note">Spot uses the asset directly. Futures need separate leverage, funding, and liquidation rules.</span>
+            </label>
+            <label>
+              Market
+              <input id="backtest-symbol" name="symbol" list="backtest-symbol-options" value="sample" placeholder="BTC/USDT" />
+              <datalist id="backtest-symbol-options"></datalist>
+              <span class="field-note">Use `sample` for offline data. Binance commonly uses BTC/USDT; Kraken commonly uses BTC/USD.</span>
+            </label>
+            <label>
+              Timeframe
+              <select id="backtest-timeframe" name="timeframe">
+                <option value="csv">Dataset timeframe</option>
+              </select>
+              <span class="field-note">The candle interval used by the strategy. Exchange data supports common intervals such as 1m, 5m, 1h, and 1d.</span>
+            </label>
+          </div>
           <div class="split-grid">
             <label>
               Start date
@@ -139,6 +178,15 @@
               <input name="end_date" type="date" />
             </label>
           </div>
+          <div class="preset-row" aria-label="Backtest date presets">
+            <span class="field-note">Quick range:</span>
+            <button class="btn btn-secondary compact" type="button" data-date-preset="7">Recent week</button>
+            <button class="btn btn-secondary compact" type="button" data-date-preset="30">Recent month</button>
+            <button class="btn btn-secondary compact" type="button" data-date-preset="365">Recent year</button>
+            <button class="btn btn-secondary compact" type="button" data-date-preset="2190">Six years</button>
+            <button class="btn btn-secondary compact" type="button" data-date-preset="clear">Clear</button>
+          </div>
+          <p class="field-note">A preset fills the dates only. The exchange must have candles for the selected range, and a coin cannot have data before it was listed.</p>
           <label>
             Notes
             <textarea name="notes" rows="3" placeholder="What are you testing?"></textarea>
@@ -149,18 +197,22 @@
               <label>
                 Base capital
                 <input name="config_overrides.base_capital" type="number" min="1" step="0.01" placeholder="20.00" />
+                <span class="field-note">Starting capital for the test. Keep this small while experimenting.</span>
               </label>
               <label>
                 Fee rate
                 <input name="config_overrides.fee_rate" type="number" min="0" max="0.1" step="0.0001" placeholder="0.001" />
+                <span class="field-note">Exchange fee per trade. Example: 0.001 = 0.1%.</span>
               </label>
               <label>
                 Risk per trade %
                 <input name="config_overrides.strategy.risk_per_trade_pct" type="number" min="0.001" max="1" step="0.001" placeholder="0.05" />
+                <span class="field-note">How much of the bankroll is risked on each trade. Lower is safer.</span>
               </label>
               <label>
                 Reward / risk
                 <input name="config_overrides.strategy.reward_to_risk" type="number" min="0.1" max="20" step="0.1" placeholder="1.4" />
+                <span class="field-note">Target profit relative to risk. Higher values need fewer winners, but can be harder to hit.</span>
               </label>
             </div>
           </fieldset>
@@ -345,18 +397,22 @@
           <div>
             <p class="eyebrow">Settings</p>
             <h2>Persisted strategy overrides</h2>
+            <p class="helper-copy">These values become the default behavior for future runs. Change one thing at a time so you can tell what actually helped.</p>
           </div>
         </div>
         <form id="settings-form" class="form-stack">
           <div class="split-grid">
             <label>Base capital
               <input type="number" name="base_capital" min="1" step="0.01" placeholder="20.00" />
+              <span class="field-note">The fixed bankroll used for sizing. Keep this consistent across tests.</span>
             </label>
             <label>Fee rate
               <input type="number" name="fee_rate" min="0" max="0.1" step="0.0001" placeholder="0.001" />
+              <span class="field-note">Exchange fee per fill. Higher fees reduce profits and can flip results.</span>
             </label>
             <label>Slippage (bps)
               <input type="number" name="slippage_bps" min="0" max="100" step="0.1" placeholder="5.0" />
+              <span class="field-note">Estimated price impact in basis points. Increase this for less liquid markets.</span>
             </label>
           </div>
           <fieldset>
@@ -364,12 +420,15 @@
             <div class="split-grid">
               <label>Max daily loss %
                 <input type="number" name="risk.max_daily_loss_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+                <span class="field-note">Daily stop level. Once hit, the bot should stop opening new trades for the day.</span>
               </label>
               <label>Max consecutive losses
                 <input type="number" name="risk.max_consecutive_losses" min="1" max="100" step="1" placeholder="3" />
+                <span class="field-note">Stops the system after repeated losses to protect against a bad streak.</span>
               </label>
               <label>Cooldown bars
                 <input type="number" name="risk.cooldown_bars" min="0" max="1000" step="1" placeholder="5" />
+                <span class="field-note">Wait time after a loss before looking for another setup.</span>
               </label>
             </div>
           </fieldset>
@@ -378,21 +437,27 @@
             <div class="split-grid">
               <label>EMA fast
                 <input type="number" name="strategy.ema_fast_period" min="2" max="500" step="1" placeholder="8" />
+                <span class="field-note">Shorter trend filter. Reacts faster, but can be noisier.</span>
               </label>
               <label>EMA slow
                 <input type="number" name="strategy.ema_slow_period" min="3" max="500" step="1" placeholder="21" />
+                <span class="field-note">Longer trend filter. Helps define the broader direction.</span>
               </label>
               <label>ATR period
                 <input type="number" name="strategy.atr_period" min="2" max="500" step="1" placeholder="14" />
+                <span class="field-note">Measures volatility. Higher values smooth the signal more.</span>
               </label>
               <label>Risk per trade %
                 <input type="number" name="strategy.risk_per_trade_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+                <span class="field-note">Primary sizing control. Lower values reduce drawdown risk.</span>
               </label>
               <label>Max position %
                 <input type="number" name="strategy.max_position_pct" min="0.01" max="1" step="0.01" placeholder="1.0" />
+                <span class="field-note">Caps how much of the bankroll can be deployed at once.</span>
               </label>
               <label>Reward / risk
                 <input type="number" name="strategy.reward_to_risk" min="0.1" max="20" step="0.1" placeholder="1.4" />
+                <span class="field-note">Profit target size relative to stop size. Tune this slowly.</span>
               </label>
             </div>
           </fieldset>

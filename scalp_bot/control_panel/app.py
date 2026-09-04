@@ -36,7 +36,12 @@ def create_app(
 
     repo_root = _repo_root()
     resolved_config_path = Path(config_path or os.environ.get("SCALP_BOT_CONFIG_PATH", repo_root / "config" / "sample_config.json"))
-    resolved_data_path = Path(data_path or os.environ.get("SCALP_BOT_DATA_PATH", repo_root / "data" / "btcusdt_1h.csv"))
+    default_data_path = repo_root / "data" / "btcusdt_1h.csv"
+    if not default_data_path.exists():
+        sample_data_path = repo_root / "data" / "sample_ohlcv.csv"
+        if sample_data_path.exists():
+            default_data_path = sample_data_path
+    resolved_data_path = Path(data_path or os.environ.get("SCALP_BOT_DATA_PATH", default_data_path))
     resolved_database_path = Path(database_path or os.environ.get("CONTROL_PANEL_DB_PATH", _default_database_path()))
 
     template_dir = Path(__file__).parent / "templates"
@@ -119,6 +124,11 @@ def create_app(
     @require_auth
     def get_app_metadata():
         return jsonify(service.app_metadata())
+
+    @app.get("/api/market-data/status")
+    @require_auth
+    def get_market_data_status():
+        return jsonify(service.market_data_status(request.args.to_dict()))
 
     @app.get("/api/status")
     @require_auth
@@ -253,7 +263,7 @@ def create_app(
             return jsonify({"errors": errors}), 422
         try:
             run = service.run_backtest(body)
-        except ValueError as exc:
+        except (ValueError, RuntimeError) as exc:
             return _value_error_response("backtest", exc, status_code=400, public_error="Unable to create backtest.")
         audit.record("backtest", _actor(), "success", run["id"])
         return jsonify(run), 201

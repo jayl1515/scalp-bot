@@ -8,5 +8,12 @@ version = "0.1.0"
 description = "Fixed-capital crypto scalping bot framework with profit sweep logic"
 requires-python = ">=3.11"
 
+[project.scripts]
+scalp-bot-panel = "scalp_bot.control_panel.app:main"
+scalp-bot = "scalp_bot.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["scalp_bot*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

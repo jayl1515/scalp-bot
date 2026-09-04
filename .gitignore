@@ -4,6 +4,8 @@ __pycache__/
 .venv/
 venv/
 .env
+instance/
+data/market_cache/
 .coverage
 htmlcov/
 .dist/

@@ -9,6 +9,7 @@ from typing import Any
 from ..backtest import Backtester
 from ..config import build_config, load_config_data
 from ..data import candle_time_range, filter_candles, load_candles
+from ..market_data import cache_summary, fetch_historical_candles
 from .state import BotState
 from .storage import AppDatabase, utc_now_iso
 
@@ -84,17 +85,45 @@ class ControlPanelService:
             payload = _deep_merge(payload, overrides)
         return payload
 
-    def _load_dataset(self):
+    def _load_dataset(
+        self,
+        *,
+        exchange: str = "binance",
+        symbol: str = "sample",
+        timeframe: str = "csv",
+        market_type: str = "spot",
+        start: str | None = None,
+        end: str | None = None,
+    ):
+        # The current implementation still uses a single local CSV file, but the
+        # service boundary is being shaped so the UI and API can start carrying
+        # symbol/timeframe selections without changing persistence again later.
+        if symbol != "sample" or timeframe != "csv":
+            if market_type != "spot":
+                raise ValueError("Futures market data is not enabled yet. Use spot mode for this milestone.")
+            if not start or not end:
+                raise ValueError("Start and end dates are required for exchange data.")
+            return fetch_historical_candles(
+                exchange_id=exchange,
+                symbol=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+            )
         if self._candles_cache is None:
             self._candles_cache = load_candles(self.data_path)
         return self._candles_cache
 
-    def dataset_summary(self) -> dict[str, Any]:
+    def dataset_summary(self, *, symbol: str | None = None, timeframe: str | None = None) -> dict[str, Any]:
+        symbol = symbol or "sample"
+        timeframe = timeframe or "csv"
         if self._dataset_cache is None:
-            candles = self._load_dataset()
+            candles = self._load_dataset(symbol=symbol, timeframe=timeframe)
             start_at, end_at = candle_time_range(candles)
             self._dataset_cache = {
                 "path": str(self.data_path.resolve()),
+                "symbol": symbol,
+                "timeframe": timeframe,
                 "total_candles": len(candles),
                 "start_at": start_at,
                 "end_at": end_at,
@@ -115,12 +144,37 @@ class ControlPanelService:
                 "history",
                 "settings",
             ],
+            "market_options": {
+                "exchanges": ["binance", "kraken"],
+                "symbols": ["sample", "BTC/USDT", "ETH/USDT", "SOL/USDT", "BTC/USD", "ETH/USD"],
+                "timeframes": ["csv", "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"],
+                "market_types": ["spot"],
+            },
         }
+
+    def market_data_status(self, payload: dict[str, Any]) -> dict[str, Any]:
+        exchange = payload.get("exchange") or "binance"
+        symbol = payload.get("symbol") or "BTC/USDT"
+        timeframe = payload.get("timeframe") or "1h"
+        if symbol == "sample" or timeframe == "csv":
+            return self.dataset_summary()
+        return cache_summary(exchange_id=exchange, symbol=symbol, timeframe=timeframe)
 
     def run_backtest(self, payload: dict[str, Any]) -> dict[str, Any]:
         overrides = payload.get("config_overrides") or {}
+        exchange = payload.get("exchange") or "binance"
+        symbol = payload.get("symbol") or "sample"
+        timeframe = payload.get("timeframe") or "csv"
+        market_type = payload.get("market_type") or "spot"
         candles = filter_candles(
-            self._load_dataset(),
+            self._load_dataset(
+                exchange=exchange,
+                symbol=symbol,
+                timeframe=timeframe,
+                market_type=market_type,
+                start=payload.get("start_date"),
+                end=payload.get("end_date"),
+            ),
             start=payload.get("start_date"),
             end=payload.get("end_date"),
         )
@@ -140,6 +194,10 @@ class ControlPanelService:
                 "requested_at": utc_now_iso(),
                 "total_candles": len(candles),
                 "dataset_path": str(self.data_path.resolve()),
+                "exchange": exchange,
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "market_type": market_type,
             },
             notes=payload.get("notes"),
         )
@@ -150,6 +208,10 @@ class ControlPanelService:
                 "timestamp": utc_now_iso(),
                 "start_date": payload.get("start_date"),
                 "end_date": payload.get("end_date"),
+                "exchange": exchange,
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "market_type": market_type,
                 "config_overrides": overrides,
             },
         )
@@ -177,6 +239,10 @@ class ControlPanelService:
             "total_candles": len(candles),
             "total_trades": result.metrics.total_trades,
             "net_pnl": result.metrics.net_pnl,
+            "exchange": exchange,
+            "symbol": symbol,
+            "timeframe": timeframe,
+            "market_type": market_type,
             "start_at": candles[0].timestamp.isoformat(),
             "end_at": candles[-1].timestamp.isoformat(),
         }

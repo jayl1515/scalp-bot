@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import csv
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from pathlib import Path
 
 from .models import Candle
@@ -30,8 +30,12 @@ def _parse_boundary(value: str | None, *, is_end: bool) -> datetime | None:
         return None
     if "T" not in value and " " not in value:
         parsed_date = datetime.fromisoformat(value).date()
-        return datetime.combine(parsed_date, time.max if is_end else time.min)
-    return datetime.fromisoformat(value)
+        parsed = datetime.combine(parsed_date, time.max if is_end else time.min)
+    else:
+        parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+    return parsed
 
 
 def filter_candles(

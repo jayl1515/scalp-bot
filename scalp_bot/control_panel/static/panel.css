@@ -177,6 +177,21 @@ textarea {
   margin-bottom: 0.35rem;
 }
 
+.helper-copy,
+.field-note {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.helper-copy {
+  margin: 0.35rem 0 0;
+  max-width: 60ch;
+}
+
+.field-note {
+  font-size: 0.8rem;
+}
+
 .badge-row {
   display: flex;
   flex-wrap: wrap;
@@ -257,6 +272,17 @@ textarea {
 
 .compact {
   padding: 0.6rem 0.85rem;
+}
+
+.preset-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset-row .field-note {
+  margin-right: 0.25rem;
 }
 
 .stack {
