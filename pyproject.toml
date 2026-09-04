@@ -17,3 +17,6 @@ include = ["scalp_bot*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools]
+packages = ["scalp_bot"]
