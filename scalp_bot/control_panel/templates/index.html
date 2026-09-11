@@ -5,489 +5,528 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#3b82f6" />
-  <title>scalp-bot app</title>
+  <meta name="theme-color" content="#2563eb" />
+  <title>ScalpBot - Smart Crypto Trading</title>
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/static/icon.svg" />
   <link rel="stylesheet" href="/static/panel.css" />
 </head>
 <body>
+  <!-- Header Navigation -->
   <header class="app-header">
-    <div>
-      <p class="eyebrow">Installable trading control app</p>
-      <h1>⚡ scalp-bot</h1>
+    <div class="header-left">
+      <div class="app-logo">⚡</div>
+      <div class="app-title">
+        <h1>ScalpBot</h1>
+        <p class="app-tagline">Smart Trading Made Simple</p>
+      </div>
     </div>
     <div class="header-actions">
-      <button id="btn-install" class="btn btn-secondary hidden" type="button">Install</button>
-      <button id="btn-token" class="btn btn-secondary" type="button">Token</button>
+      <button id="btn-install" class="btn-icon-small hidden" type="button" title="Install app">📥</button>
+      <button id="btn-token" class="btn-icon-small" type="button" title="Authentication">🔐</button>
     </div>
   </header>
 
-  <main class="app-shell">
+  <main class="app-container">
+    <!-- Dashboard Screen -->
     <section id="screen-dashboard" class="screen active">
-      <div class="hero-card">
-        <div>
-          <p class="eyebrow">Live bot overview</p>
-          <h2 id="hero-title">Ready to trade</h2>
-          <p id="hero-subtitle" class="hero-copy">Persistent history, backtests, and paper runs in one app.</p>
+      <!-- Quick Status Card -->
+      <div class="status-card">
+        <div class="status-left">
+          <div class="status-main">
+            <h2 id="hero-title">Ready to Trade</h2>
+            <p id="hero-subtitle">Your crypto scalping assistant</p>
+          </div>
+          <div class="status-badges">
+            <span id="status-badge" class="badge badge-stopped">●  Stopped</span>
+            <span id="mode-badge" class="badge badge-paper">📄 Paper</span>
+            <span id="ks-badge" class="badge badge-danger hidden">🚨 Kill Switch</span>
+          </div>
         </div>
-        <div class="badge-row">
-          <span id="status-badge" class="badge badge-stopped">Stopped</span>
-          <span id="mode-badge" class="badge badge-paper">Paper</span>
-          <span id="ks-badge" class="badge badge-live hidden">Kill Switch</span>
+        <div class="status-indicator">
+          <div class="status-circle">
+            <span id="status-percent">0%</span>
+          </div>
         </div>
       </div>
 
-      <section class="card quick-grid">
-        <article class="stat-card">
-          <span class="stat-label">Started</span>
-          <strong id="started-at">—</strong>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Stopped</span>
-          <strong id="stopped-at">—</strong>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Last signal</span>
-          <strong id="last-signal">—</strong>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Last trade</span>
-          <strong id="last-trade">—</strong>
-        </article>
-      </section>
-
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Controls</p>
-            <h2>Safety-first execution</h2>
-            <p class="helper-copy">Use paper mode while validating ideas. Live mode should only be enabled after backtests and paper sessions look stable.</p>
+      <!-- Quick Stats Row -->
+      <div class="stats-row">
+        <div class="stat-mini">
+          <span class="stat-icon">⏱️</span>
+          <div class="stat-content">
+            <p class="stat-label">Started</p>
+            <strong id="started-at">—</strong>
           </div>
         </div>
-        <div class="button-grid">
-          <button id="btn-start" class="btn btn-primary" type="button">Start Bot</button>
-          <button id="btn-stop" class="btn btn-danger" type="button">Stop Bot</button>
-          <button id="btn-mode-paper" class="btn btn-secondary" type="button">Paper Mode</button>
-          <button id="btn-mode-live" class="btn btn-warning" type="button">Live Mode</button>
-        </div>
-        <div class="stack">
-          <button id="btn-killswitch" class="btn btn-danger ghost-danger" type="button">Activate Kill Switch</button>
-          <button id="btn-killswitch-reset" class="btn btn-secondary hidden" type="button">Reset Kill Switch</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Dataset</p>
-            <h2>Backtest source</h2>
+        <div class="stat-mini">
+          <span class="stat-icon">⏹️</span>
+          <div class="stat-content">
+            <p class="stat-label">Stopped</p>
+            <strong id="stopped-at">—</strong>
           </div>
         </div>
+        <div class="stat-mini">
+          <span class="stat-icon">📊</span>
+          <div class="stat-content">
+            <p class="stat-label">Last Signal</p>
+            <strong id="last-signal">—</strong>
+          </div>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-icon">💰</span>
+          <div class="stat-content">
+            <p class="stat-label">Last Trade</p>
+            <strong id="last-trade">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="action-section">
+        <div class="action-grid">
+          <button id="btn-start" class="btn-action btn-action-primary" type="button">
+            <span class="btn-action-icon">▶️</span>
+            <span>Start Bot</span>
+          </button>
+          <button id="btn-stop" class="btn-action btn-action-danger" type="button">
+            <span class="btn-action-icon">⏹️</span>
+            <span>Stop Bot</span>
+          </button>
+          <button id="btn-mode-paper" class="btn-action btn-action-secondary" type="button">
+            <span class="btn-action-icon">📄</span>
+            <span>Paper Mode</span>
+          </button>
+          <button id="btn-mode-live" class="btn-action btn-action-warning" type="button">
+            <span class="btn-action-icon">🔴</span>
+            <span>Live Mode</span>
+          </button>
+        </div>
+        <button id="btn-killswitch" class="btn-emergency" type="button">🚨 Emergency Stop</button>
+        <button id="btn-killswitch-reset" class="btn btn-secondary hidden" type="button">Reset Kill Switch</button>
+      </div>
+
+      <!-- Portfolio Info -->
+      <div class="info-card">
+        <h3>📊 Dataset Information</h3>
         <div class="info-grid">
-          <div>
-            <span class="info-label">Path</span>
+          <div class="info-item">
+            <span class="info-label">Data Source</span>
             <code id="dataset-path">—</code>
           </div>
-          <div>
-            <span class="info-label">Range</span>
+          <div class="info-item">
+            <span class="info-label">Date Range</span>
             <strong id="dataset-range">—</strong>
           </div>
-          <div>
-            <span class="info-label">Candles</span>
+          <div class="info-item">
+            <span class="info-label">Total Candles</span>
             <strong id="dataset-count">—</strong>
           </div>
-          <div>
-            <span class="info-label">Cache status</span>
+          <div class="info-item">
+            <span class="info-label">Cache Status</span>
             <strong id="cache-status">—</strong>
           </div>
-          <div>
-            <span class="info-label">Last updated</span>
+          <div class="info-item">
+            <span class="info-label">Last Updated</span>
             <strong id="cache-updated">—</strong>
           </div>
-          <div>
-            <span class="info-label">Token</span>
+          <div class="info-item">
+            <span class="info-label">Authentication</span>
             <strong id="token-status">Not set</strong>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Recent activity</p>
-            <h2>Latest runs</h2>
-          </div>
-          <button id="btn-refresh-dashboard" class="btn btn-secondary compact" type="button">Refresh</button>
+      <!-- Recent Activity -->
+      <div class="activity-card">
+        <div class="card-header">
+          <h3>📈 Recent Activity</h3>
+          <button id="btn-refresh-dashboard" class="btn-icon-small" type="button">🔄</button>
         </div>
-        <div id="dashboard-runs" class="list-stack empty-state">No runs yet.</div>
-      </section>
+        <div id="dashboard-runs" class="activity-list">
+          <p class="empty-message">No activity yet. Start a backtest or paper session!</p>
+        </div>
+      </div>
     </section>
 
+    <!-- Backtests Screen -->
     <section id="screen-backtests" class="screen">
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Backtest studio</p>
-            <h2>Run custom date-range tests</h2>
-            <p class="helper-copy">Pick a date range and optional overrides to compare ideas. Leave fields blank to use the current saved defaults.</p>
+      <div class="screen-header">
+        <h2>📊 Backtest Studio</h2>
+        <p>Test your strategy on historical data</p>
+      </div>
+
+      <!-- Backtest Form -->
+      <div class="form-card">
+        <h3>Create New Backtest</h3>
+        <form id="backtest-form" class="form-layout">
+          <div class="form-group">
+            <label>Test Name</label>
+            <input name="title" type="text" placeholder="e.g., Bitcoin momentum test" />
           </div>
-        </div>
-        <form id="backtest-form" class="form-stack">
-          <label>
-            Run title
-            <input name="title" type="text" placeholder="January momentum check" />
-          </label>
-          <div class="split-grid">
-            <label>
-              Exchange
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Exchange</label>
               <select id="backtest-exchange" name="exchange">
                 <option value="binance">Binance</option>
               </select>
-              <span class="field-note">The exchange providing historical candles. Binance and Kraken are available for this milestone.</span>
-            </label>
-            <label>
-              Market type
-              <select id="backtest-market-type" name="market_type">
-                <option value="spot">Spot</option>
-              </select>
-              <span class="field-note">Spot uses the asset directly. Futures need separate leverage, funding, and liquidation rules.</span>
-            </label>
-            <label>
-              Market
+            </div>
+            <div class="form-group">
+              <label>Market</label>
               <input id="backtest-symbol" name="symbol" list="backtest-symbol-options" value="sample" placeholder="BTC/USDT" />
               <datalist id="backtest-symbol-options"></datalist>
-              <span class="field-note">Use `sample` for offline data. Binance commonly uses BTC/USDT; Kraken commonly uses BTC/USD.</span>
-            </label>
-            <label>
-              Timeframe
+            </div>
+            <div class="form-group">
+              <label>Timeframe</label>
               <select id="backtest-timeframe" name="timeframe">
                 <option value="csv">Dataset timeframe</option>
               </select>
-              <span class="field-note">The candle interval used by the strategy. Exchange data supports common intervals such as 1m, 5m, 1h, and 1d.</span>
-            </label>
+            </div>
           </div>
-          <div class="split-grid">
-            <label>
-              Start date
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date</label>
               <input name="start_date" type="date" />
-            </label>
-            <label>
-              End date
+            </div>
+            <div class="form-group">
+              <label>End Date</label>
               <input name="end_date" type="date" />
-            </label>
+            </div>
           </div>
-          <div class="preset-row" aria-label="Backtest date presets">
-            <span class="field-note">Quick range:</span>
-            <button class="btn btn-secondary compact" type="button" data-date-preset="7">Recent week</button>
-            <button class="btn btn-secondary compact" type="button" data-date-preset="30">Recent month</button>
-            <button class="btn btn-secondary compact" type="button" data-date-preset="365">Recent year</button>
-            <button class="btn btn-secondary compact" type="button" data-date-preset="2190">Six years</button>
-            <button class="btn btn-secondary compact" type="button" data-date-preset="clear">Clear</button>
+
+          <div class="preset-buttons">
+            <span class="preset-label">Quick Range:</span>
+            <button class="btn-preset" type="button" data-date-preset="7">1 Week</button>
+            <button class="btn-preset" type="button" data-date-preset="30">1 Month</button>
+            <button class="btn-preset" type="button" data-date-preset="365">1 Year</button>
+            <button class="btn-preset" type="button" data-date-preset="2190">6 Years</button>
+            <button class="btn-preset" type="button" data-date-preset="clear">Clear</button>
           </div>
-          <p class="field-note">A preset fills the dates only. The exchange must have candles for the selected range, and a coin cannot have data before it was listed.</p>
-          <label>
-            Notes
-            <textarea name="notes" rows="3" placeholder="What are you testing?"></textarea>
-          </label>
-          <fieldset>
-            <legend>Quick overrides</legend>
-            <div class="split-grid">
-              <label>
-                Base capital
+
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" rows="2" placeholder="What are you testing?"></textarea>
+          </div>
+
+          <fieldset class="form-fieldset">
+            <legend>⚙️ Strategy Overrides</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Base Capital ($)</label>
                 <input name="config_overrides.base_capital" type="number" min="1" step="0.01" placeholder="20.00" />
-                <span class="field-note">Starting capital for the test. Keep this small while experimenting.</span>
-              </label>
-              <label>
-                Fee rate
+              </div>
+              <div class="form-group">
+                <label>Fee Rate</label>
                 <input name="config_overrides.fee_rate" type="number" min="0" max="0.1" step="0.0001" placeholder="0.001" />
-                <span class="field-note">Exchange fee per trade. Example: 0.001 = 0.1%.</span>
-              </label>
-              <label>
-                Risk per trade %
+              </div>
+              <div class="form-group">
+                <label>Risk Per Trade %</label>
                 <input name="config_overrides.strategy.risk_per_trade_pct" type="number" min="0.001" max="1" step="0.001" placeholder="0.05" />
-                <span class="field-note">How much of the bankroll is risked on each trade. Lower is safer.</span>
-              </label>
-              <label>
-                Reward / risk
+              </div>
+              <div class="form-group">
+                <label>Reward/Risk Ratio</label>
                 <input name="config_overrides.strategy.reward_to_risk" type="number" min="0.1" max="20" step="0.1" placeholder="1.4" />
-                <span class="field-note">Target profit relative to risk. Higher values need fewer winners, but can be harder to hit.</span>
-              </label>
+              </div>
             </div>
           </fieldset>
-          <button class="btn btn-primary" type="submit">Run Backtest</button>
-        </form>
-        <div id="backtest-msg" class="inline-msg hidden"></div>
-      </section>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Results</p>
-            <h2>Newest backtest</h2>
-          </div>
+          <button class="btn-primary" type="submit">🚀 Run Backtest</button>
+          <div id="backtest-msg" class="form-message hidden"></div>
+        </form>
+      </div>
+
+      <!-- Results -->
+      <div class="results-card">
+        <h3>📈 Latest Results</h3>
+        <div id="backtest-result" class="result-container">
+          <p class="empty-message">Run a backtest to see results</p>
         </div>
-        <div id="backtest-result" class="empty-state">Run a backtest to see full metrics, trades, and history here.</div>
-      </section>
+      </div>
     </section>
 
+    <!-- Paper Trading Screen -->
     <section id="screen-paper" class="screen">
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Paper trading</p>
-            <h2>Persistent session logging</h2>
+      <div class="screen-header">
+        <h2>📄 Paper Trading Journal</h2>
+        <p>Practice without real money</p>
+      </div>
+
+      <!-- Active Session -->
+      <div id="paper-session-summary" class="form-card">
+        <p class="empty-message">No active session. Start one below!</p>
+      </div>
+
+      <!-- Start Session Form -->
+      <div class="form-card">
+        <h3>Start New Session</h3>
+        <form id="paper-start-form" class="form-layout">
+          <div class="form-group">
+            <label>Session Name</label>
+            <input name="title" type="text" placeholder="e.g., Morning trading session" />
           </div>
-        </div>
-        <div id="paper-session-summary" class="empty-state">No active paper session.</div>
-        <form id="paper-start-form" class="form-stack">
-          <label>
-            Session title
-            <input name="title" type="text" placeholder="Morning paper run" />
-          </label>
-          <label>
-            Notes
-            <textarea name="notes" rows="2" placeholder="Session goal or setup"></textarea>
-          </label>
-          <div class="button-grid">
-            <button class="btn btn-primary" type="submit">Start Paper Session</button>
-            <button id="btn-paper-stop" class="btn btn-secondary" type="button">Stop Session</button>
+          <div class="form-group">
+            <label>Session Notes</label>
+            <textarea name="notes" rows="2" placeholder="What's your game plan?"></textarea>
+          </div>
+          <div class="form-row">
+            <button class="btn-primary" type="submit">▶️ Start Session</button>
+            <button id="btn-paper-stop" class="btn btn-danger" type="button">⏹️ Stop Session</button>
           </div>
         </form>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Quick signal log</p>
-            <h2>Capture setup notes</h2>
-          </div>
-        </div>
-        <form id="paper-signal-form" class="form-stack">
-          <div class="split-grid">
-            <label>
-              Symbol
+      <!-- Signal Logger -->
+      <div class="form-card">
+        <h3>📍 Log Trading Signal</h3>
+        <form id="paper-signal-form" class="form-layout">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Symbol</label>
               <input name="symbol" type="text" placeholder="BTCUSDT" />
-            </label>
-            <label>
-              Bias
+            </div>
+            <div class="form-group">
+              <label>Direction</label>
               <select name="bias">
-                <option value="long">Long</option>
-                <option value="short">Short</option>
-                <option value="watch">Watch</option>
+                <option value="long">📈 Long</option>
+                <option value="short">📉 Short</option>
+                <option value="watch">👁️ Watch</option>
               </select>
-            </label>
-            <label>
-              Price
+            </div>
+            <div class="form-group">
+              <label>Entry Price</label>
               <input name="price" type="number" step="0.0001" placeholder="101.25" />
-            </label>
+            </div>
           </div>
-          <label>
-            Note
-            <textarea name="note" rows="2" placeholder="Breakout above VWAP"></textarea>
-          </label>
-          <button class="btn btn-secondary" type="submit">Log Signal</button>
+          <div class="form-group">
+            <label>Setup Notes</label>
+            <textarea name="note" rows="2" placeholder="Breakout, support, resistance..."></textarea>
+          </div>
+          <button class="btn-secondary" type="submit">📌 Log Signal</button>
         </form>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Trade journal</p>
-            <h2>Store each paper trade cleanly</h2>
-          </div>
-        </div>
-        <form id="paper-trade-form" class="form-stack">
-          <div class="split-grid">
-            <label>
-              Symbol
-              <input name="symbol" type="text" placeholder="BTCUSDT" />
-            </label>
-            <label>
-              Side
+      <!-- Trade Logger -->
+      <div class="form-card">
+        <h3>💹 Log Trade</h3>
+        <form id="paper-trade-form" class="form-layout">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Coin</label>
+              <input name="symbol" type="text" placeholder="BTC" />
+            </div>
+            <div class="form-group">
+              <label>Side</label>
               <select name="side">
-                <option value="long">Long</option>
-                <option value="short">Short</option>
+                <option value="long">📈 Long</option>
+                <option value="short">📉 Short</option>
               </select>
-            </label>
-            <label>
-              Quantity
+            </div>
+            <div class="form-group">
+              <label>Quantity</label>
               <input name="quantity" type="number" step="0.0001" placeholder="0.10" />
-            </label>
-            <label>
-              Entry
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Entry Price</label>
               <input name="entry_price" type="number" step="0.0001" placeholder="100.25" />
-            </label>
-            <label>
-              Exit
+            </div>
+            <div class="form-group">
+              <label>Exit Price</label>
               <input name="exit_price" type="number" step="0.0001" placeholder="101.40" />
-            </label>
-            <label>
-              Exit reason
+            </div>
+            <div class="form-group">
+              <label>Exit Reason</label>
               <input name="exit_reason" type="text" placeholder="Target hit" />
-            </label>
+            </div>
           </div>
-          <label>
-            Note
-            <textarea name="note" rows="2" placeholder="Why you entered or exited"></textarea>
-          </label>
-          <button class="btn btn-primary" type="submit">Log Trade</button>
+          <div class="form-group">
+            <label>Trade Notes</label>
+            <textarea name="note" rows="2" placeholder="Why did you enter/exit?"></textarea>
+          </div>
+          <button class="btn-primary" type="submit">💰 Log Trade</button>
         </form>
-      </section>
+      </div>
     </section>
 
+    <!-- History Screen -->
     <section id="screen-history" class="screen">
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Run history</p>
-            <h2>Backtests and paper logs</h2>
-          </div>
-          <button id="btn-refresh-history" class="btn btn-secondary compact" type="button">Refresh</button>
-        </div>
-        <div class="filter-bar">
-          <label>
-            Type
-            <select id="history-type">
-              <option value="">All</option>
-              <option value="backtest">Backtests</option>
-              <option value="paper">Paper</option>
-            </select>
-          </label>
-          <label>
-            Status
-            <select id="history-status">
-              <option value="">Any</option>
-              <option value="completed">Completed</option>
-              <option value="running">Running</option>
-              <option value="stopped">Stopped</option>
-              <option value="failed">Failed</option>
-            </select>
-          </label>
-          <button id="btn-compare-runs" class="btn btn-secondary compact" type="button">Compare Selected</button>
-        </div>
-        <div id="history-list" class="list-stack empty-state">No saved runs yet.</div>
-      </section>
+      <div class="screen-header">
+        <h2>📚 History</h2>
+        <p>View all your backtests and sessions</p>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Run detail</p>
-            <h2>Selected record</h2>
-          </div>
+      <!-- Filters -->
+      <div class="filter-section">
+        <div class="filter-row">
+          <select id="history-type">
+            <option value="">All Types</option>
+            <option value="backtest">Backtests</option>
+            <option value="paper">Paper Sessions</option>
+          </select>
+          <select id="history-status">
+            <option value="">Any Status</option>
+            <option value="completed">✅ Completed</option>
+            <option value="running">▶️ Running</option>
+            <option value="stopped">⏹️ Stopped</option>
+            <option value="failed">❌ Failed</option>
+          </select>
+          <button id="btn-compare-runs" class="btn-icon-small" type="button" title="Compare selected">📊</button>
+          <button id="btn-refresh-history" class="btn-icon-small" type="button" title="Refresh">🔄</button>
         </div>
-        <div id="run-detail" class="empty-state">Choose a run from history to inspect trades, metrics, and events.</div>
-      </section>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Comparison</p>
-            <h2>Side-by-side metrics</h2>
-          </div>
+      <!-- History List -->
+      <div id="history-list" class="history-list">
+        <p class="empty-message">No runs yet. Create a backtest or start a paper session!</p>
+      </div>
+
+      <!-- Run Detail -->
+      <div class="detail-section">
+        <h3>📋 Run Details</h3>
+        <div id="run-detail" class="detail-container">
+          <p class="empty-message">Select a run to view details</p>
         </div>
-        <div id="compare-detail" class="empty-state">Select two or more runs to compare.</div>
-      </section>
+      </div>
+
+      <!-- Comparison -->
+      <div class="comparison-section">
+        <h3>📊 Comparison</h3>
+        <div id="compare-detail" class="comparison-container">
+          <p class="empty-message">Select 2+ runs to compare</p>
+        </div>
+      </div>
     </section>
 
+    <!-- Settings Screen -->
     <section id="screen-settings" class="screen">
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Settings</p>
-            <h2>Persisted strategy overrides</h2>
-            <p class="helper-copy">These values become the default behavior for future runs. Change one thing at a time so you can tell what actually helped.</p>
-          </div>
-        </div>
-        <form id="settings-form" class="form-stack">
-          <div class="split-grid">
-            <label>Base capital
-              <input type="number" name="base_capital" min="1" step="0.01" placeholder="20.00" />
-              <span class="field-note">The fixed bankroll used for sizing. Keep this consistent across tests.</span>
-            </label>
-            <label>Fee rate
-              <input type="number" name="fee_rate" min="0" max="0.1" step="0.0001" placeholder="0.001" />
-              <span class="field-note">Exchange fee per fill. Higher fees reduce profits and can flip results.</span>
-            </label>
-            <label>Slippage (bps)
-              <input type="number" name="slippage_bps" min="0" max="100" step="0.1" placeholder="5.0" />
-              <span class="field-note">Estimated price impact in basis points. Increase this for less liquid markets.</span>
-            </label>
-          </div>
-          <fieldset>
-            <legend>Risk</legend>
-            <div class="split-grid">
-              <label>Max daily loss %
-                <input type="number" name="risk.max_daily_loss_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
-                <span class="field-note">Daily stop level. Once hit, the bot should stop opening new trades for the day.</span>
-              </label>
-              <label>Max consecutive losses
-                <input type="number" name="risk.max_consecutive_losses" min="1" max="100" step="1" placeholder="3" />
-                <span class="field-note">Stops the system after repeated losses to protect against a bad streak.</span>
-              </label>
-              <label>Cooldown bars
-                <input type="number" name="risk.cooldown_bars" min="0" max="1000" step="1" placeholder="5" />
-                <span class="field-note">Wait time after a loss before looking for another setup.</span>
-              </label>
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Strategy</legend>
-            <div class="split-grid">
-              <label>EMA fast
-                <input type="number" name="strategy.ema_fast_period" min="2" max="500" step="1" placeholder="8" />
-                <span class="field-note">Shorter trend filter. Reacts faster, but can be noisier.</span>
-              </label>
-              <label>EMA slow
-                <input type="number" name="strategy.ema_slow_period" min="3" max="500" step="1" placeholder="21" />
-                <span class="field-note">Longer trend filter. Helps define the broader direction.</span>
-              </label>
-              <label>ATR period
-                <input type="number" name="strategy.atr_period" min="2" max="500" step="1" placeholder="14" />
-                <span class="field-note">Measures volatility. Higher values smooth the signal more.</span>
-              </label>
-              <label>Risk per trade %
-                <input type="number" name="strategy.risk_per_trade_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
-                <span class="field-note">Primary sizing control. Lower values reduce drawdown risk.</span>
-              </label>
-              <label>Max position %
-                <input type="number" name="strategy.max_position_pct" min="0.01" max="1" step="0.01" placeholder="1.0" />
-                <span class="field-note">Caps how much of the bankroll can be deployed at once.</span>
-              </label>
-              <label>Reward / risk
-                <input type="number" name="strategy.reward_to_risk" min="0.1" max="20" step="0.1" placeholder="1.4" />
-                <span class="field-note">Profit target size relative to stop size. Tune this slowly.</span>
-              </label>
-            </div>
-          </fieldset>
-          <button class="btn btn-primary" type="submit">Save Settings</button>
-        </form>
-        <div id="settings-msg" class="inline-msg hidden"></div>
-      </section>
+      <div class="screen-header">
+        <h2>⚙️ Settings</h2>
+        <p>Customize your trading parameters</p>
+      </div>
 
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Audit log</p>
-            <h2>Persisted safety trail</h2>
+      <!-- Settings Form -->
+      <div class="form-card">
+        <h3>Trading Parameters</h3>
+        <form id="settings-form" class="form-layout">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Base Capital ($)</label>
+              <input type="number" name="base_capital" min="1" step="0.01" placeholder="20.00" />
+            </div>
+            <div class="form-group">
+              <label>Fee Rate</label>
+              <input type="number" name="fee_rate" min="0" max="0.1" step="0.0001" placeholder="0.001" />
+            </div>
+            <div class="form-group">
+              <label>Slippage (bps)</label>
+              <input type="number" name="slippage_bps" min="0" max="100" step="0.1" placeholder="5.0" />
+            </div>
           </div>
-          <button id="btn-refresh-logs" class="btn btn-secondary compact" type="button">Refresh</button>
+
+          <fieldset class="form-fieldset">
+            <legend>🛡️ Risk Controls</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Max Daily Loss %</label>
+                <input type="number" name="risk.max_daily_loss_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+              </div>
+              <div class="form-group">
+                <label>Max Consecutive Losses</label>
+                <input type="number" name="risk.max_consecutive_losses" min="1" max="100" step="1" placeholder="3" />
+              </div>
+              <div class="form-group">
+                <label>Cooldown Bars</label>
+                <input type="number" name="risk.cooldown_bars" min="0" max="1000" step="1" placeholder="5" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-fieldset">
+            <legend>📊 Strategy Indicators</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label>EMA Fast Period</label>
+                <input type="number" name="strategy.ema_fast_period" min="2" max="500" step="1" placeholder="8" />
+              </div>
+              <div class="form-group">
+                <label>EMA Slow Period</label>
+                <input type="number" name="strategy.ema_slow_period" min="3" max="500" step="1" placeholder="21" />
+              </div>
+              <div class="form-group">
+                <label>ATR Period</label>
+                <input type="number" name="strategy.atr_period" min="2" max="500" step="1" placeholder="14" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Risk Per Trade %</label>
+                <input type="number" name="strategy.risk_per_trade_pct" min="0.001" max="1" step="0.001" placeholder="0.05" />
+              </div>
+              <div class="form-group">
+                <label>Max Position %</label>
+                <input type="number" name="strategy.max_position_pct" min="0.01" max="1" step="0.01" placeholder="1.0" />
+              </div>
+              <div class="form-group">
+                <label>Reward / Risk Ratio</label>
+                <input type="number" name="strategy.reward_to_risk" min="0.1" max="20" step="0.1" placeholder="1.4" />
+              </div>
+            </div>
+          </fieldset>
+
+          <button class="btn-primary" type="submit">💾 Save Settings</button>
+          <div id="settings-msg" class="form-message hidden"></div>
+        </form>
+      </div>
+
+      <!-- Audit Log -->
+      <div class="form-card">
+        <div class="card-header">
+          <h3>🔐 Audit Log</h3>
+          <button id="btn-refresh-logs" class="btn-icon-small" type="button">🔄</button>
         </div>
-        <ul id="log-list" class="log-list"></ul>
-      </section>
+        <ul id="log-list" class="log-list">
+          <li class="empty-message">No audit entries yet</li>
+        </ul>
+      </div>
     </section>
   </main>
 
-  <nav class="tabbar">
-    <button class="tabbar-btn active" data-screen="dashboard" type="button">Dashboard</button>
-    <button class="tabbar-btn" data-screen="backtests" type="button">Backtests</button>
-    <button class="tabbar-btn" data-screen="paper" type="button">Paper</button>
-    <button class="tabbar-btn" data-screen="history" type="button">History</button>
-    <button class="tabbar-btn" data-screen="settings" type="button">Settings</button>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-screen="dashboard" type="button">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-btn" data-screen="backtests" type="button">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Backtest</span>
+    </button>
+    <button class="nav-btn" data-screen="paper" type="button">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">Paper</span>
+    </button>
+    <button class="nav-btn" data-screen="history" type="button">
+      <span class="nav-icon">📚</span>
+      <span class="nav-label">History</span>
+    </button>
+    <button class="nav-btn" data-screen="settings" type="button">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
+    </button>
   </nav>
 
+  <!-- Toast Notifications -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader"></div>
+  </div>
+
   <script src="/static/panel.js"></script>
 </body>
 </html>
